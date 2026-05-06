@@ -367,6 +367,64 @@ export default function App() {
     document.documentElement.classList.add("dark");
   }, [state.settings]);
 
+  // Static favicon — chữ Z gradient xanh tím
+  useEffect(() => {
+    const SIZE = 32;
+    const canvas = document.createElement("canvas");
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    const ctx = canvas.getContext("2d")!;
+    const cx = SIZE / 2;
+    const cy = SIZE / 2;
+    const r = SIZE / 2 - 1;
+
+    const grad = ctx.createLinearGradient(0, 0, SIZE, SIZE);
+    grad.addColorStop(0, "#2563eb");
+    grad.addColorStop(0.5, "#6366f1");
+    grad.addColorStop(1, "#7c3aed");
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 18px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Z", cx, cy + 1);
+
+    let link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = canvas.toDataURL("image/png");
+  }, []);
+
+  // Braille spinner trong tab title — 10fps khi đang xử lý
+  useEffect(() => {
+    const APP_NAME = "ZhiYu Subtitle";
+    const FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+    const isAnimated = ["processing", "transcribing", "translating"].includes(state.status);
+
+    if (!isAnimated) {
+      document.title = APP_NAME;
+      return;
+    }
+
+    let frameIndex = 0;
+    const interval = setInterval(() => {
+      frameIndex = (frameIndex + 1) % FRAMES.length;
+      document.title = `${FRAMES[frameIndex]} ${APP_NAME}`;
+    }, 100); // 10fps
+
+    return () => {
+      clearInterval(interval);
+      document.title = APP_NAME;
+    };
+  }, [state.status]);
+
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.playbackRate = playbackSpeed;
