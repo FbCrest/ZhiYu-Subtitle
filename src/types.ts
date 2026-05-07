@@ -44,7 +44,7 @@ export interface GeminiKeyRecord {
   label?: string;
   status: 'active' | 'inactive' | 'error';
   tier: 'free' | 'paid';
-  hasQuota: boolean;
+  hasQuota?: boolean; // deprecated, kept for migration compatibility
   lastUsed?: number;
   errorCount: number;
 }

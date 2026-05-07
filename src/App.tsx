@@ -591,7 +591,6 @@ export default function App() {
                 ...k,
                 status: "error",
                 errorCount: k.errorCount + 1,
-                hasQuota: isQuotaError ? false : k.hasQuota,
               }
             : k,
         ),

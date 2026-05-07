@@ -125,7 +125,6 @@ async function executeWithRotation<T>(
   let lastError: any;
   for (const keyRecord of sortedKeys) {
     if (keyRecord.status === 'error' && keyRecord.errorCount > 5) continue;
-    if (!keyRecord.hasQuota) continue;
 
     try {
       const ai = getGenAI(keyRecord.key);

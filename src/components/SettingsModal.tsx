@@ -309,7 +309,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({ isOpen,
       key: newKey.trim(),
       status: 'active',
       tier: 'free',
-      hasQuota: true,
       errorCount: 0
     };
     setLocalSettings(prev => ({
@@ -324,13 +323,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({ isOpen,
     setLocalSettings(prev => ({
       ...prev,
       apiKeys: prev.apiKeys.map(k => k.id === id ? { ...k, tier: k.tier === 'free' ? 'paid' : 'free' } : k)
-    }));
-  };
-
-  const toggleQuota = (id: string) => {
-    setLocalSettings(prev => ({
-      ...prev,
-      apiKeys: prev.apiKeys.map(k => k.id === id ? { ...k, hasQuota: !k.hasQuota } : k)
     }));
   };
 
@@ -585,20 +577,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({ isOpen,
                             </Tooltip>
                           </div>
 
-                          {/* Quota Badge */}
-                          <Tooltip content={keyRecord.hasQuota ? "Đánh dấu là đã hết Quota" : "Đánh dấu là còn Quota"}>
-                            <button 
-                              onClick={() => toggleQuota(keyRecord.id)}
-                              className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-1.5
-                                ${keyRecord.hasQuota 
-                                  ? 'bg-green-600/10 text-green-400 border border-green-600/30' 
-                                  : 'bg-red-600/10 text-red-400 border border-red-600/30'}
-                              `}
-                            >
-                              <div className={`w-1.5 h-1.5 rounded-full ${keyRecord.hasQuota ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
-                              {keyRecord.hasQuota ? 'Còn Quota' : 'Hết Quota'}
-                            </button>
-                          </Tooltip>
+                          {/* Quota Badge removed */}
 
                           <div className="h-4 w-px bg-zinc-800" />
 
