@@ -257,13 +257,29 @@ export async function transcribeVideo(
 
     // Thử parse JSON trước (nếu Gemini trả về JSON)
     try {
-      const trimmed = rawText.trim();
-      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-        const parsed = JSON.parse(trimmed);
+      // Strip markdown code fences nếu có (```json ... ```)
+      const stripped = rawText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+      if (stripped.startsWith('[') || stripped.startsWith('{')) {
+        const parsed = JSON.parse(stripped);
         const arr = Array.isArray(parsed) ? parsed : [];
-        if (arr.length > 0 && typeof arr[0].startTime === 'number') {
-          items = arr;
-          console.log('[Transcribe] Parsed as JSON, items:', items.length);
+        if (arr.length > 0) {
+          // Normalize nhiều field name variants mà Gemini hay trả về:
+          // { startTime, endTime, text } — format chuẩn
+          // { start, end, label }        — format Gemini hay dùng
+          // { start, end, text }
+          // { startTime, endTime, label }
+          const normalized = arr
+            .map((item: any) => ({
+              startTime: item.startTime ?? item.start ?? 0,
+              endTime:   item.endTime   ?? item.end   ?? 0,
+              text:      item.text      ?? item.label ?? item.content ?? '',
+            }))
+            .filter((item: any) => item.text && typeof item.startTime === 'number');
+
+          if (normalized.length > 0) {
+            items = normalized;
+            console.log('[Transcribe] Parsed as JSON, items:', items.length);
+          }
         }
       }
     } catch (e) {
